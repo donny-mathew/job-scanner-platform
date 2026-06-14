@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: scoring-service
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:scoringdb}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: scoring-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.jobscanner.scan.adapter.out.messaging"
+        spring.json.value.default.type: "com.jobscanner.scoring.adapter.in.messaging.JobDiscoveredEventDto"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info
+  endpoint:
+    health:
+      show-details: always
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiry-hours: ${JWT_EXPIRY_HOURS:24}
+  scorer: ${APP_SCORER:mock}
+  anthropic:
+    api-key: ${ANTHROPIC_API_KEY:}
+    model: ${ANTHROPIC_MODEL:claude-haiku-4-5-20251001}
+    base-url: ${ANTHROPIC_BASE_URL:https://api.anthropic.com}
+  scan-service:
+    base-url: ${SCAN_SERVICE_URL:http://scan-service:8081}
+  cache:
+    score-ttl-seconds: ${SCORE_CACHE_TTL_SECONDS:604800}

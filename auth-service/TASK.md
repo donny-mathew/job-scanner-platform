@@ -31,13 +31,16 @@ Build a production-grade multi-tenant auth service (Phase 1 of the job-scanner S
 
 ## 🗺️ Platform Roadmap
 
-### Phase 2 — Scan + AI Scoring Pipeline (future)
+### Phase 2 — Scan + AI Scoring Pipeline ✅
 | Status | Task |
 |--------|------|
-| ⚪ | Kafka producer in auth-service (user-registered events) |
-| ⚪ | New `scan-service`: consume events, scrape job boards |
-| ⚪ | Anthropic API integration for AI job scoring |
-| ⚪ | Redis LLM response cache (per-tenant, per-query) |
+| ✅ | `scan-service`: search configs, job discovery, Kafka producer |
+| ✅ | `scoring-service`: Kafka consumer, AI scoring (mock + Anthropic) |
+| ✅ | Redis LLM response cache (SHA-256 keyed, 7-day TTL) |
+| ✅ | Root `docker-compose.yml` wiring all five containers |
+| ✅ | `infra/postgres/init-multiple-dbs.sh` (authdb, scandb, scoringdb) |
+| ✅ | Multi-tenant isolation integration tests (Testcontainers) |
+| ✅ | Root `README.md` with full pipeline run instructions |
 
 ### Phase 3 — Search/Results Service + Gateway (future)
 | Status | Task |
