@@ -1,0 +1,22 @@
+# Maven
+auth-service/target/
+auth-service/.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+
+# Secrets / credentials
+*.env
+.env
+credentials/
+token.json
+client_secret.json
+
+# Runtime data
+data/
+logs/
