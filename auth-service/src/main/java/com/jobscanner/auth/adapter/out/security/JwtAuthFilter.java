@@ -53,9 +53,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(auth);
         } catch (JWTVerificationException e) {
             // Invalid token — leave SecurityContext empty; Spring Security will reject the request
-        } finally {
+        }
+
+        // Separated from JWT parsing so TenantContext.clear() is guaranteed to run
+        // even if chain.doFilter() throws ServletException or IOException.
+        try {
             chain.doFilter(request, response);
+        } finally {
             TenantContext.clear();
+            SecurityContextHolder.clearContext();
         }
     }
 }
