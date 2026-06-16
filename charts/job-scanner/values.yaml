@@ -1,0 +1,92 @@
+imageRegistry: ""
+imageTag: latest
+
+jwtSecret: "change-me-to-a-secure-secret-of-at-least-32-chars"
+
+postgres:
+  host: postgres
+  port: 5432
+  username: jobscanner
+  password: secret
+  databases: "authdb,scandb,scoringdb"
+
+redis:
+  host: redis
+  port: 6379
+
+kafka:
+  bootstrapServers: kafka:9092
+
+opensearch:
+  host: opensearch
+  port: 9200
+  scheme: http
+  username: admin
+  password: admin
+
+authService:
+  port: 8080
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+scanService:
+  port: 8081
+  replicaCount: 1
+  jobProvider: mock
+  apifyToken: ""
+  apifyActorId: ""
+  schedulerEnabled: true
+  schedulerIntervalMs: 300000
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+scoringService:
+  port: 8082
+  replicaCount: 1
+  scorer: mock
+  anthropicApiKey: ""
+  anthropicModel: claude-haiku-4-5-20251001
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+searchService:
+  port: 8083
+  replicaCount: 1
+  searchIndex: memory
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+apiGateway:
+  port: 8090
+  nodePort: 30090
+  replicaCount: 1
+  rateLimitReplenishRate: 20
+  rateLimitBurstCapacity: 40
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi

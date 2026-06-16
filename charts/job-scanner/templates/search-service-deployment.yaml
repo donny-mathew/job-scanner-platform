@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-service
+  labels:
+    app: search-service
+    {{- include "job-scanner.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.searchService.replicaCount }}
+  selector:
+    matchLabels:
+      app: search-service
+  template:
+    metadata:
+      labels:
+        app: search-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: search-service
+          image: {{ include "job-scanner.image" (dict "registry" .Values.imageRegistry "name" "search-service" "tag" .Values.imageTag) }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.searchService.port }}
+          envFrom:
+            - configMapRef:
+                name: search-service-config
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: job-scanner-secrets
+                  key: jwt-secret
+            - name: OPENSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: job-scanner-secrets
+                  key: db-password
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.searchService.port }}
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.searchService.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources: {{- toYaml .Values.searchService.resources | nindent 12 }}

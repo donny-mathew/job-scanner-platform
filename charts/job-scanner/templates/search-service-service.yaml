@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-service
+  labels:
+    app: search-service
+    {{- include "job-scanner.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: search-service
+  ports:
+    - port: {{ .Values.searchService.port }}
+      targetPort: {{ .Values.searchService.port }}

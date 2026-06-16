@@ -1,0 +1,6 @@
+apiVersion: v2
+name: job-scanner
+description: Multi-tenant AI-powered job scanner SaaS — local kind deployment
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

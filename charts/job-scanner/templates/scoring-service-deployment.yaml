@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scoring-service
+  labels:
+    app: scoring-service
+    {{- include "job-scanner.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.scoringService.replicaCount }}
+  selector:
+    matchLabels:
+      app: scoring-service
+  template:
+    metadata:
+      labels:
+        app: scoring-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: scoring-service
+          image: {{ include "job-scanner.image" (dict "registry" .Values.imageRegistry "name" "scoring-service" "tag" .Values.imageTag) }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.scoringService.port }}
+          envFrom:
+            - configMapRef:
+                name: scoring-service-config
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: job-scanner-secrets
+                  key: jwt-secret
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: job-scanner-secrets
+                  key: db-password
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: job-scanner-secrets
+                  key: anthropic-api-key
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.scoringService.port }}
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.scoringService.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources: {{- toYaml .Values.scoringService.resources | nindent 12 }}

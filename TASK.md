@@ -7,16 +7,6 @@ Build a cloud-native, multi-tenant AI-powered job scanner SaaS from Phase 1 thro
 
 ## 📋 Active Tasks
 
-### Phase 4 — Local Kubernetes (kind) + Helm
-
-| Status | Task | Notes |
-|--------|------|-------|
-| ⚪ | Install and configure kind cluster | Single-node for local dev |
-| ⚪ | Write Helm chart for each service (auth, scan, scoring, search, gateway) | One chart per service with values.yaml |
-| ⚪ | Write umbrella Helm chart for full stack | Depends on all service charts |
-| ⚪ | Package and deploy to kind cluster | `helm install job-scanner ./charts/job-scanner` |
-| ⚪ | Verify full pipeline works in kind | Signup → scan → score → search via gateway |
-
 ### Phase 5 — ArgoCD GitOps + GitHub Actions CI
 
 | Status | Task | Notes |
@@ -58,3 +48,12 @@ Build a cloud-native, multi-tenant AI-powered job scanner SaaS from Phase 1 thro
   - api-gateway: Spring Cloud Gateway, JWT validation, per-tenant rate limiting (Redis), routing to all downstream services
   - Docker Compose updated: OpenSearch, search-service, api-gateway wired
   - 31 tests passing across search-service and api-gateway
+- ✅ **Phase 4** — Local Kubernetes (kind) + Helm:
+  - All 5 Dockerfiles rewritten: 3-stage layered jar builds, non-root appuser, Spring Boot JarLauncher
+  - server.port env-var support added to auth/scan/scoring services
+  - management.health.probes.enabled=true added to all services (k8s liveness/readiness sub-paths)
+  - kind-config.yaml: single-node cluster, hostPort 8090 → NodePort 30090
+  - Helm umbrella chart at charts/job-scanner/: infra (postgres, redis, zookeeper, kafka, opensearch) + 5 app services with ConfigMaps, shared Secret, probes, securityContext
+  - Kafka single PLAINTEXT listener at kafka:9092 (k8s DNS, no bridge port)
+  - Makefile: make up/down/build/load/deploy/status/smoke
+  - scripts/smoke-test.sh: signup → profile → search config → scan → poll → search

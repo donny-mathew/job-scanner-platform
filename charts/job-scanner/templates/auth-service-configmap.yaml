@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-service-config
+  labels:
+    app: auth-service
+    {{- include "job-scanner.labels" . | nindent 4 }}
+data:
+  SERVER_PORT: {{ .Values.authService.port | quote }}
+  DB_HOST: {{ .Values.postgres.host | quote }}
+  DB_PORT: {{ .Values.postgres.port | quote }}
+  DB_NAME: "authdb"
+  DB_USERNAME: {{ .Values.postgres.username | quote }}
+  REDIS_HOST: {{ .Values.redis.host | quote }}
+  REDIS_PORT: {{ .Values.redis.port | quote }}

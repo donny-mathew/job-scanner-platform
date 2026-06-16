@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scan-service
+  labels:
+    app: scan-service
+    {{- include "job-scanner.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.scanService.replicaCount }}
+  selector:
+    matchLabels:
+      app: scan-service
+  template:
+    metadata:
+      labels:
+        app: scan-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: scan-service
+          image: {{ include "job-scanner.image" (dict "registry" .Values.imageRegistry "name" "scan-service" "tag" .Values.imageTag) }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.scanService.port }}
+          envFrom:
+            - configMapRef:
+                name: scan-service-config
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: job-scanner-secrets
+                  key: jwt-secret
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: job-scanner-secrets
+                  key: db-password
+            - name: APIFY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: job-scanner-secrets
+                  key: apify-token
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.scanService.port }}
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.scanService.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources: {{- toYaml .Values.scanService.resources | nindent 12 }}

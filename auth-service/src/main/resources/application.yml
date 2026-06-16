@@ -1,3 +1,6 @@
+server:
+  port: ${SERVER_PORT:8080}
+
 spring:
   application:
     name: auth-service
@@ -34,6 +37,9 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+    probes:
+      enabled: true
 
 app:
   jwt:

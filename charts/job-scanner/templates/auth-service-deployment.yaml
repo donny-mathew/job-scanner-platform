@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  labels:
+    app: auth-service
+    {{- include "job-scanner.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.authService.replicaCount }}
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: auth-service
+          image: {{ include "job-scanner.image" (dict "registry" .Values.imageRegistry "name" "auth-service" "tag" .Values.imageTag) }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.authService.port }}
+          envFrom:
+            - configMapRef:
+                name: auth-service-config
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: job-scanner-secrets
+                  key: jwt-secret
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: job-scanner-secrets
+                  key: db-password
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.authService.port }}
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.authService.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources: {{- toYaml .Values.authService.resources | nindent 12 }}

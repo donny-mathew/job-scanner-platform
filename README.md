@@ -210,6 +210,61 @@ cd api-gateway && mvn test
 
 ---
 
+## Phase 4 — Local Kubernetes (kind + Helm)
+
+Run the entire platform on a local `kind` cluster with a single command. No cloud account required; all adapters default to mocks.
+
+### Prerequisites
+
+```bash
+brew install kind helm kubectl
+```
+
+### Start everything
+
+```bash
+make up
+```
+
+This creates a `kind` cluster, builds all 5 Docker images, loads them into kind, and deploys the Helm chart. The API gateway is accessible at `http://localhost:8090` via a NodePort → hostPort mapping.
+
+### Verify
+
+```bash
+make status        # kubectl get pods — all should be Running
+make smoke         # end-to-end: signup → scan → search
+```
+
+### Tear down
+
+```bash
+make down          # deletes the kind cluster
+```
+
+### Individual targets
+
+| Target | What it does |
+|--------|-------------|
+| `make cluster` | Create kind cluster only |
+| `make build` | Build all 5 Docker images |
+| `make load` | Load images into kind (no registry needed) |
+| `make deploy` | Helm install/upgrade |
+| `make status` | `kubectl get pods` |
+| `make smoke` | End-to-end smoke test |
+
+### Switching adapters in k8s
+
+```bash
+helm upgrade --install job-scanner charts/job-scanner \
+  --set scanService.jobProvider=apify \
+  --set scanService.apifyToken=your_token \
+  --set scoringService.scorer=anthropic \
+  --set scoringService.anthropicApiKey=your_key \
+  --set searchService.searchIndex=opensearch
+```
+
+---
+
 ## Environment Variables
 
 | Variable | Required | Default | Description |
