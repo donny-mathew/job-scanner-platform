@@ -7,6 +7,7 @@ import com.jobscanner.scoring.domain.model.JobScore;
 import com.jobscanner.scoring.domain.model.ScoringProfile;
 import com.jobscanner.scoring.domain.port.in.ScoreJobUseCase;
 import com.jobscanner.scoring.domain.port.out.*;
+import com.jobscanner.scoring.domain.port.out.JobScoredEventPort;
 import com.jobscanner.scoring.domain.value.JobListingDto;
 import com.jobscanner.scoring.domain.value.ScoreResult;
 import org.slf4j.Logger;
@@ -27,17 +28,20 @@ public class ScoreJobService implements ScoreJobUseCase {
     private final JobListingClient jobListingClient;
     private final JobScorer scorer;
     private final ScoringCachePort cache;
+    private final JobScoredEventPort eventPort;
 
     public ScoreJobService(ScoringProfileRepository profileRepository,
                            JobScoreRepository scoreRepository,
                            JobListingClient jobListingClient,
                            JobScorer scorer,
-                           ScoringCachePort cache) {
+                           ScoringCachePort cache,
+                           JobScoredEventPort eventPort) {
         this.profileRepository = profileRepository;
         this.scoreRepository = scoreRepository;
         this.jobListingClient = jobListingClient;
         this.scorer = scorer;
         this.cache = cache;
+        this.eventPort = eventPort;
     }
 
     @Override
@@ -72,6 +76,8 @@ public class ScoreJobService implements ScoreJobUseCase {
 
         JobScore score = new JobScore(UUID.randomUUID(), tenantId, jobListingId,
                 result.score(), result.reasoning(), result.model(), OffsetDateTime.now());
-        return scoreRepository.save(score);
+        JobScore saved = scoreRepository.save(score);
+        eventPort.publish(saved, listing);
+        return saved;
     }
 }

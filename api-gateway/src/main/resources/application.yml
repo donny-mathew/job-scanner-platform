@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: api-gateway
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: ${SERVER_PORT:8090}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info
+  endpoint:
+    health:
+      show-details: always
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+  routes:
+    auth-service: ${AUTH_SERVICE_URL:http://auth-service:8080}
+    scan-service: ${SCAN_SERVICE_URL:http://scan-service:8081}
+    scoring-service: ${SCORING_SERVICE_URL:http://scoring-service:8082}
+    search-service: ${SEARCH_SERVICE_URL:http://search-service:8083}
+  rate-limit:
+    replenish-rate: ${RATE_LIMIT_REPLENISH_RATE:20}
+    burst-capacity: ${RATE_LIMIT_BURST_CAPACITY:40}

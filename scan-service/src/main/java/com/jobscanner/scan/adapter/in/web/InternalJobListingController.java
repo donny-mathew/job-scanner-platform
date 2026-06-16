@@ -5,6 +5,7 @@ import com.jobscanner.scan.domain.port.out.JobListingRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
@@ -29,10 +30,11 @@ public class InternalJobListingController {
     }
 
     record JobListingDto(UUID id, UUID tenantId, String title, String company,
-                         String location, String url, String rawPayload) {
+                         String location, String url, String rawPayload,
+                         String source, OffsetDateTime discoveredAt) {
         static JobListingDto from(JobListing l) {
             return new JobListingDto(l.id(), l.tenantId(), l.title(), l.company(),
-                    l.location(), l.url(), l.rawPayload());
+                    l.location(), l.url(), l.rawPayload(), l.source(), l.discoveredAt());
         }
     }
 }

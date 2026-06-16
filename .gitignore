@@ -1,5 +1,5 @@
 # Maven
-auth-service/target/
+**/target/
 auth-service/.mvn/wrapper/maven-wrapper.jar
 
 # IDE

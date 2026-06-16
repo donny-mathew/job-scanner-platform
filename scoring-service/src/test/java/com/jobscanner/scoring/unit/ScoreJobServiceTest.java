@@ -6,6 +6,7 @@ import com.jobscanner.scoring.domain.exception.ScoringProfileNotFoundException;
 import com.jobscanner.scoring.domain.model.JobScore;
 import com.jobscanner.scoring.domain.model.ScoringProfile;
 import com.jobscanner.scoring.domain.port.out.*;
+import com.jobscanner.scoring.domain.port.out.JobScoredEventPort;
 import com.jobscanner.scoring.domain.value.JobListingDto;
 import com.jobscanner.scoring.domain.value.ScoreResult;
 import org.junit.jupiter.api.AfterEach;
@@ -31,6 +32,7 @@ class ScoreJobServiceTest {
     @Mock JobListingClient jobListingClient;
     @Mock JobScorer scorer;
     @Mock ScoringCachePort cache;
+    @Mock JobScoredEventPort eventPort;
 
     ScoreJobService service;
     UUID tenantId = UUID.randomUUID();
@@ -41,12 +43,13 @@ class ScoreJobServiceTest {
     @BeforeEach
     void setUp() {
         service = new ScoreJobService(profileRepository, scoreRepository,
-                jobListingClient, scorer, cache);
+                jobListingClient, scorer, cache, eventPort);
         profile = new ScoringProfile(UUID.randomUUID(), tenantId,
                 "Java/Spring Boot lead, 8 years experience, seeking AU visa sponsorship",
                 OffsetDateTime.now());
         listing = new JobListingDto(jobListingId, tenantId, "Senior Java Engineer",
-                "Acme Corp", "Sydney", "https://example.com", "{\"description\":\"Great role\"}");
+                "Acme Corp", "Sydney", "https://example.com", "{\"description\":\"Great role\"}",
+                "mock", OffsetDateTime.now());
     }
 
     @AfterEach

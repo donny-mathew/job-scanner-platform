@@ -100,10 +100,12 @@ class MultiTenantScoringIT {
 
         when(jobListingClient.fetchJobListing(jobIdForA)).thenReturn(Optional.of(
                 new JobListingDto(jobIdForA, tenantA, "Senior Java Engineer",
-                        "Acme AU", "Sydney", "https://example.com/a", "{}")));
+                        "Acme AU", "Sydney", "https://example.com/a", "{}", "mock",
+                        java.time.OffsetDateTime.now())));
         when(jobListingClient.fetchJobListing(jobIdForB)).thenReturn(Optional.of(
                 new JobListingDto(jobIdForB, tenantB, "Lead Python Developer",
-                        "StartupB", "Melbourne", "https://example.com/b", "{}")));
+                        "StartupB", "Melbourne", "https://example.com/b", "{}", "mock",
+                        java.time.OffsetDateTime.now())));
 
         // Score for Tenant A
         JobScore scoreA = scoreJobUseCase.scoreJob(tenantA, jobIdForA);
