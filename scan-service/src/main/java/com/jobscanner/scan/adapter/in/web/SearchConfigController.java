@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/search-configs")
+@RequestMapping("/api/v1/scans/search-configs")
 public class SearchConfigController {
 
     private final SearchConfigUseCase useCase;

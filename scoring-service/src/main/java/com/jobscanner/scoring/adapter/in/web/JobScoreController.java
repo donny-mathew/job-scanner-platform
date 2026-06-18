@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/job-scores")
+@RequestMapping("/api/v1/scores/job-scores")
 public class JobScoreController {
 
     private final JobScoreRepository scoreRepository;

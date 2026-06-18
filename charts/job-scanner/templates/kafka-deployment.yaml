@@ -35,11 +35,14 @@ spec:
               value: "1"
             - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
               value: "true"
-          livenessProbe:
-            exec:
-              command: ["kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
-            initialDelaySeconds: 60
-            periodSeconds: 15
+            - name: KAFKA_PORT
+              value: ""
+          startupProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 24
           resources:
             requests:
               cpu: 300m

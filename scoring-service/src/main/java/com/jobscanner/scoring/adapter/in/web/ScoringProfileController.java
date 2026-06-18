@@ -10,7 +10,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/scoring-profile")
+@RequestMapping("/api/v1/scores/scoring-profile")
 public class ScoringProfileController {
 
     private final ScoringProfileUseCase useCase;

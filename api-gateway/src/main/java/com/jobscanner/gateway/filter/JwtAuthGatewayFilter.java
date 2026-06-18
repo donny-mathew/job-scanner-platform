@@ -7,7 +7,10 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -34,15 +37,26 @@ public class JwtAuthGatewayFilter implements GatewayFilter {
                     .build()
                     .verify(header.substring(7));
 
-            // Propagate verified claims to downstream services
-            ServerWebExchange mutated = exchange.mutate()
-                    .request(r -> r
-                            .header("X-Tenant-Id", jwt.getClaim("tenant_id").asString())
-                            .header("X-User-Id", jwt.getSubject())
-                            .header("X-User-Role", jwt.getClaim("role").asString()))
-                    .build();
+            String tenantId = jwt.getClaim("tenant_id").asString();
+            String userId = jwt.getSubject();
+            String role = jwt.getClaim("role").asString();
 
-            return chain.filter(mutated);
+            // Build a mutable copy of headers and inject verified claims.
+            // ServerHttpRequestDecorator is used because DefaultServerHttpRequestBuilder
+            // exposes ReadOnlyHttpHeaders to mutation lambdas, causing UnsupportedOperationException.
+            ServerHttpRequest decorated = new ServerHttpRequestDecorator(exchange.getRequest()) {
+                @Override
+                public HttpHeaders getHeaders() {
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.addAll(super.getHeaders());
+                    headers.set("X-Tenant-Id", tenantId);
+                    headers.set("X-User-Id", userId);
+                    headers.set("X-User-Role", role);
+                    return headers;
+                }
+            };
+
+            return chain.filter(exchange.mutate().request(decorated).build());
         } catch (JWTVerificationException e) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();

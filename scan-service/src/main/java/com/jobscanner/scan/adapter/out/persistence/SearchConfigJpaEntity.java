@@ -27,6 +27,7 @@ class SearchConfigJpaEntity {
     @Column
     private String location;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "filters_json", nullable = false, columnDefinition = "jsonb")
     private String filtersJson;
 

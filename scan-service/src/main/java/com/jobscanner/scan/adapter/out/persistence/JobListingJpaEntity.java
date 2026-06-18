@@ -2,6 +2,8 @@ package com.jobscanner.scan.adapter.out.persistence;
 
 import com.jobscanner.scan.domain.model.JobListing;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -32,6 +34,7 @@ class JobListingJpaEntity {
     @Column(nullable = false)
     private String url;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "raw_payload", nullable = false, columnDefinition = "jsonb")
     private String rawPayload;
 

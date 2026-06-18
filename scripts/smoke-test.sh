@@ -2,8 +2,10 @@
 set -euo pipefail
 
 BASE_URL="http://localhost:8090"
-EMAIL="smoketest-$(date +%s)@example.com"
+TS=$(date +%s)
+EMAIL="smoketest-${TS}@smoke-${TS}.io"
 PASSWORD="SmokeTest123!"
+TENANT_NAME="Smoke-${TS}"
 
 echo "=== Job Scanner Smoke Test ==="
 echo ""
@@ -12,7 +14,7 @@ echo ""
 echo "1. Signing up..."
 SIGNUP_RESP=$(curl -sf -X POST "$BASE_URL/api/v1/auth/signup" \
   -H "Content-Type: application/json" \
-  -d "{\"email\":\"$EMAIL\",\"password\":\"$PASSWORD\",\"tenantName\":\"Smoke Test Co\"}")
+  -d "{\"email\":\"$EMAIL\",\"password\":\"$PASSWORD\",\"tenantName\":\"$TENANT_NAME\"}")
 TOKEN=$(echo "$SIGNUP_RESP" | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
 if [ -z "$TOKEN" ]; then
   echo "ERROR: signup did not return a token. Response: $SIGNUP_RESP"
@@ -36,7 +38,7 @@ echo "3. Creating search config..."
 curl -sf -X POST "$BASE_URL/api/v1/scans/search-configs" \
   -H "Content-Type: application/json" \
   -H "$AUTH_HEADER" \
-  -d '{"keywords":["java","spring boot"],"location":"Remote","maxResults":5}' \
+  -d '{"keywords":["java","spring boot"],"location":"Remote","maxResults":5,"enabled":true}' \
   > /dev/null
 echo "   OK"
 
@@ -57,7 +59,7 @@ SEARCH_RESP=$(curl -sf "$BASE_URL/api/v1/jobs/search?q=java" \
   -H "$AUTH_HEADER")
 echo "   Response: $SEARCH_RESP"
 
-JOB_COUNT=$(echo "$SEARCH_RESP" | grep -o '"jobListingId"' | wc -l | tr -d ' ')
+JOB_COUNT=$(echo "$SEARCH_RESP" | grep -o '"id"' | wc -l | tr -d ' ')
 if [ "$JOB_COUNT" -eq 0 ]; then
   echo ""
   echo "WARNING: No scored jobs found in search results."
