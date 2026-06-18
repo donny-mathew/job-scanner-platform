@@ -4,7 +4,7 @@ RELEASE_NAME = job-scanner
 NAMESPACE    = default
 SERVICES     = auth-service scan-service scoring-service search-service api-gateway
 
-.PHONY: up down cluster build load deploy status smoke
+.PHONY: up down cluster build load deploy status smoke argocd-setup argocd-open
 
 up: cluster build load deploy
 
@@ -31,3 +31,9 @@ status:
 
 smoke:
 	./scripts/smoke-test.sh
+
+argocd-setup:
+	bash gitops/setup.sh
+
+argocd-open:
+	kubectl port-forward svc/argocd-server -n argocd 8888:443

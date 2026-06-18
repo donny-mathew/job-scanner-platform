@@ -11,11 +11,12 @@ Build a cloud-native, multi-tenant AI-powered job scanner SaaS from Phase 1 thro
 
 | Status | Task | Notes |
 |--------|------|-------|
-| ⚪ | Install ArgoCD in kind cluster | |
-| ⚪ | Create ArgoCD Application manifests for each service | |
-| ⚪ | Set up GitHub Actions CI pipeline | Build, test, push images on PR |
-| ⚪ | Configure ArgoCD auto-sync from main branch | |
-| ⚪ | Verify GitOps deploy: push code → CI → ArgoCD → cluster | |
+| 🟡 | Create `.github/workflows/ci.yml` | test → build → push GHCR → update imageTag |
+| ⚪ | Create `gitops/argocd-app.yaml` | ArgoCD Application pointing at charts/job-scanner |
+| ⚪ | Create `gitops/setup.sh` | One-time ArgoCD install script |
+| ⚪ | Update `Makefile` with argocd-setup / argocd-open targets | |
+| ⚪ | Run `make argocd-setup` — install ArgoCD in kind cluster | |
+| ⚪ | Push to main → verify CI green + GHCR images + ArgoCD syncs | |
 
 ### Phase 6 — AWS/EKS via Terraform
 
