@@ -1,5 +1,5 @@
 imageRegistry: ghcr.io/donny-mathew
-imageTag: sha-2083aa9088e4efb4b2231b1a33d9f94dbcc9f6b9
+imageTag: sha-8ee7ca1a31a50be9433b1e674647f0f6fee339e8
 
 jwtSecret: "change-me-to-a-secure-secret-of-at-least-32-chars"
 
