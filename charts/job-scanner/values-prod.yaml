@@ -1,0 +1,33 @@
+# Production overrides for EKS deployment
+# Apply with: helm upgrade --install job-scanner charts/job-scanner \
+#   -f charts/job-scanner/values.yaml \
+#   -f charts/job-scanner/values-prod.yaml
+
+# Image registry — set by CI to ghcr.io/donny-mathew after terraform apply
+imageRegistry: "ghcr.io/donny-mathew"
+
+# RDS PostgreSQL — fill from: terraform output rds_endpoint
+postgres:
+  host: "<rds_endpoint>"
+  port: 5432
+  username: jobscanner
+  # password comes from db-password k8s secret (create before helm install)
+
+# ElastiCache Redis — fill from: terraform output redis_endpoint
+redis:
+  host: "<redis_endpoint>"
+  port: 6379
+
+# Kafka and OpenSearch stay in-cluster (MSK/OpenSearch Service deferred to Phase 7)
+
+# Scale up for prod
+authService:
+  replicas: 2
+scanService:
+  replicas: 2
+scoringService:
+  replicas: 2
+searchService:
+  replicas: 2
+apiGateway:
+  replicas: 2

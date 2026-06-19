@@ -17,6 +17,12 @@ credentials/
 token.json
 client_secret.json
 
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/tfplan
+
 # Runtime data
 data/
 logs/
