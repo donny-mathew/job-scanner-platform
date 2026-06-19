@@ -7,16 +7,15 @@ Build a cloud-native, multi-tenant AI-powered job scanner SaaS from Phase 1 thro
 
 ## 📋 Active Tasks
 
-### Phase 5 — ArgoCD GitOps + GitHub Actions CI
+### Phase 6 — AWS/EKS via Terraform
 
 | Status | Task | Notes |
 |--------|------|-------|
-| 🟡 | Create `.github/workflows/ci.yml` | test → build → push GHCR → update imageTag |
-| ⚪ | Create `gitops/argocd-app.yaml` | ArgoCD Application pointing at charts/job-scanner |
-| ⚪ | Create `gitops/setup.sh` | One-time ArgoCD install script |
-| ⚪ | Update `Makefile` with argocd-setup / argocd-open targets | |
-| ⚪ | Run `make argocd-setup` — install ArgoCD in kind cluster | |
-| ⚪ | Push to main → verify CI green + GHCR images + ArgoCD syncs | |
+| ⚪ | Write Terraform modules: VPC, EKS, RDS (Postgres), ElastiCache (Redis), MSK (Kafka) | |
+| ⚪ | Configure IRSA (IAM Roles for Service Accounts) | For least-privilege pod permissions |
+| ⚪ | Deploy OpenSearch Service (AWS managed) | |
+| ⚪ | Apply Terraform and verify cluster | |
+| ⚪ | Deploy services via ArgoCD to EKS | |
 
 ### Phase 6 — AWS/EKS via Terraform
 
@@ -49,6 +48,7 @@ Build a cloud-native, multi-tenant AI-powered job scanner SaaS from Phase 1 thro
   - api-gateway: Spring Cloud Gateway, JWT validation, per-tenant rate limiting (Redis), routing to all downstream services
   - Docker Compose updated: OpenSearch, search-service, api-gateway wired
   - 31 tests passing across search-service and api-gateway
+- ✅ **Phase 5** — GitHub Actions CI + ArgoCD GitOps: `.github/workflows/ci.yml` (test → build multi-platform → push GHCR → update imageTag), ArgoCD installed in kind cluster, auto-sync on every push to main, smoke test passing on GHCR images
 - ✅ **Phase 4** — Local Kubernetes (kind) + Helm:
   - All 5 Dockerfiles rewritten: 3-stage layered jar builds, non-root appuser, Spring Boot JarLauncher
   - server.port env-var support added to auth/scan/scoring services
